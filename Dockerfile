@@ -11,13 +11,15 @@ RUN mvn dependency:go-offline -B
 COPY src ./src
 
 # Build the application
-RUN mvn package
+RUN mvn clean package
 
 # Stage 2: Deployment stage
 FROM tomcat:8.5.76-jdk11-openjdk-slim AS deploy
 
+WORKDIR /usr/local/tomcat/webapps
+
 # Copy the built WAR file from the build stage to Tomcat's webapps directory
-COPY --from=build /app/target/*.war /usr/local/tomcat/webapps/my-app.war
+COPY --from=build /app/target/*.war ai-leads.war
 
 # Optionally, you can set environment variables or perform other configurations here
 # For example:
@@ -27,5 +29,4 @@ COPY --from=build /app/target/*.war /usr/local/tomcat/webapps/my-app.war
 EXPOSE 8080
 
 # Start Tomcat
-CMD ["catalina.sh", "run"]
-
+CMD ["/usr/local/tomcat/bin/catalina.sh", "run"]
